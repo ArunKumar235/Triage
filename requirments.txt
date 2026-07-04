@@ -5,3 +5,4 @@ asyncpg
 alembic
 python-dotenv
 fastapi
+uvicorn[standard]
