@@ -1,8 +1,8 @@
 import uuid
 from enum import Enum
 from datetime import datetime, UTC
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, Enum as SQLEnum
+from sqlalchemy.orm import Mapped, mapped_column, validates
+from sqlalchemy import ForeignKey, Enum as SQLEnum, String, DateTime
 
 from triage.models.db.base import Base
 from triage.models.schemas.testable_type import TestableType
@@ -12,7 +12,11 @@ from triage.models.schemas.testable_status import TestableStatus
 class Testable(Base):
     __tablename__ = "testables"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[str] = mapped_column(
+        String(15), 
+        primary_key=True, 
+        comment="Unique identifier for the testable, start with STRY | DEF"
+    )
 
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("teams.id"), nullable=False)
 
@@ -56,4 +60,24 @@ class Testable(Base):
 
     assigned_to: Mapped[uuid.UUID] = mapped_column(ForeignKey("team_members.id"), nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False, 
+        default=lambda: datetime.now(UTC)
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False, 
+        default=lambda: datetime.now(UTC), 
+        onupdate=lambda: datetime.now(UTC)
+    )
+
+    @validates("id")
+    def validate_id(self, key: str, value: str) -> str:
+        value = value.strip()
+        if not (value.startswith("STRY-") or value.startswith("DEF-")):
+            raise ValueError("id must start with STRY- or DEF-")
+        if len(value) > 15:
+            raise ValueError("id must be less than 15 characters")
+        return value

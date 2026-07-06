@@ -3,8 +3,7 @@ from typing import Optional
 from datetime import UTC, datetime
 
 from sqlalchemy.orm import Mapped, mapped_column, validates
-from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import ForeignKey, String, DateTime
 
 from triage.models.db.base import Base
 from triage.models.schemas.assignment_decision import AssignmentDecision
@@ -15,7 +14,7 @@ class AssignmentHistory(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
 
-    testable_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("testables.id"), nullable=False)
+    testable_id: Mapped[str] = mapped_column(String(15), ForeignKey("testables.id"), nullable=False)
 
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("teams.id"), nullable=False)
 
@@ -34,7 +33,18 @@ class AssignmentHistory(Base):
 
     overridden_reasoning: Mapped[Optional[str]] = mapped_column(nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        nullable=False, 
+        default=lambda: datetime.now(UTC)
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        nullable=False, 
+        default=lambda: datetime.now(UTC), 
+        onupdate=lambda: datetime.now(UTC)
+    )
 
     @validates("confidence")
     def validate_confidence(self, key, value):
