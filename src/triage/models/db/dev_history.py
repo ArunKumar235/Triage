@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, Enum as SQLEnum
+from sqlalchemy import ForeignKey, Enum as SQLEnum, String
 
 from triage.models.db.base import Base
 from triage.models.schemas.role import Role
@@ -10,7 +10,7 @@ class DevHistory(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
 
-    testable_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("testables.id"), nullable=False)
+    testable_id: Mapped[str] = mapped_column(String(15), ForeignKey("testables.id"), nullable=False)
 
     team_member_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team_members.id"), nullable=False)
 

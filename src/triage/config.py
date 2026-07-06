@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     environment: str = "development"
 
     database_url: str
+    webhook_shared_secret: str
 
     model_config = SettingsConfigDict(
         env_file=".env", 

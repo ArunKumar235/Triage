@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from triage.api.deps import get_db
+from triage.api.deps import get_db, verify_webhook_signature
 
 router = APIRouter(prefix="/health", tags=["health"])
 
@@ -10,9 +10,9 @@ async def health() -> dict:
     """Checks if the service is up and running."""
     return {"status": "ok"}
 
-@router.get("/ready")
-async def ready(db : AsyncSession = Depends(get_db)) -> dict:
-    """Checks the dependencies the assignment pipeline actually needs at runtime."""
+@router.get("/db")
+async def db_health(db : AsyncSession = Depends(get_db)) -> dict:
+    """Checks the database connection."""
     checks = {"database": False}
     try:
         await db.execute(text("SELECT 1"))
@@ -22,3 +22,8 @@ async def ready(db : AsyncSession = Depends(get_db)) -> dict:
 
     healthy = all(checks.values())
     return {"status": "ready" if healthy else "degraded", "checks": checks}
+
+@router.get("/webhooks", dependencies=[Depends(verify_webhook_signature)])
+async def webhook_health() -> dict:
+    """Checks if the webhook signature is valid."""
+    return {"status": "ok"}
