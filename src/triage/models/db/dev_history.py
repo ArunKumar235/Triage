@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, Enum as SQLEnum, String
 
 from triage.models.db.base import Base
-from triage.models.schemas.role import Role
+from triage.models.schemas.enums.role import Role
 
 class DevHistory(Base):
     __tablename__ = "dev_history"

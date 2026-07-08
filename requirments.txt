@@ -6,3 +6,5 @@ alembic
 python-dotenv
 fastapi
 uvicorn[standard]
+
+aiokafka

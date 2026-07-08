@@ -1,9 +1,8 @@
-from select import select
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from triage.models.db.team_member import TeamMember
-from triage.models.schemas.webhook_payloads import TeamMemberWebhookPayload
+from triage.models.schemas.webhook_payloads import MemberAvailabilityWebhookPayload, TeamMemberWebhookPayload
 from triage.repositories.team_member_repo import TeamMemberRepository
 
 class TeamMemberService:
@@ -36,3 +35,15 @@ class TeamMemberService:
         Checks if a team exists in the database.
         """
         return await self._repo.team_exists(team_id)
+    
+    async def update_member_availability(self, team_id: uuid.UUID, payload: MemberAvailabilityWebhookPayload) -> None:
+        """
+        Updates the availability of a team member.
+        """
+        if(not await self.team_exists(team_id)):
+            raise ValueError("Team not found")
+
+        if(not await self._repo.get_team_member(team_id, payload.member_id)):
+            raise ValueError(f"Team member with id {payload.member_id} does not exist in team {team_id}")
+        
+        await self._repo.update_member_availability(team_id, payload.member_id, payload.is_available)

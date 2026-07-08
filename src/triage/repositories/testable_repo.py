@@ -1,9 +1,8 @@
-import uuid
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete, select
 
-from triage.models.schemas.role import Role
+from triage.models.schemas.enums.role import Role
+from triage.models.schemas.enums.testable_status import TestableStatus
 from triage.models.schemas.webhook_payloads import TestableWebhookPayload
 from triage.models.db.testable import Testable
 from triage.models.db.dev_history import DevHistory
@@ -33,7 +32,9 @@ class TestableRepository:
         existing.testable_type = testable.testable_type
         existing.priority = testable.priority
         existing.build_points = testable.build_points
-        existing.status = testable.status
+        if existing.status is None:
+            existing.status = TestableStatus.UNASSIGNED
+        
 
         await self._session.execute(
             delete(DevHistory).where(DevHistory.testable_id == testable.testable_id)

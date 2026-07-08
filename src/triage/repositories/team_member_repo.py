@@ -50,3 +50,22 @@ class TeamMemberRepository:
         query = select(TeamMember).where(TeamMember.team_id == team_id).order_by(TeamMember.display_name.asc())
         result = await self._session.scalars(query)
         return result.all()
+
+    async def get_team_member(self, team_id: uuid.UUID, member_id: uuid.UUID) -> TeamMember:
+        """
+        Retrieves a specific team member by ID for a given team from the database.
+        """
+        query = select(TeamMember).where(TeamMember.team_id == team_id, TeamMember.id == member_id)
+        result = await self._session.scalar(query)
+        return result
+
+    async def update_member_availability(self, team_id: uuid.UUID, member_id: uuid.UUID, is_available: bool) -> None:
+        """
+        Updates the availability of a team member.
+        """
+        team_member = await self.get_team_member(team_id, member_id)
+        if team_member is None:
+            raise ValueError(f"Team member with id {member_id} does not exist in team {team_id}")
+        
+        team_member.is_available = is_available
+        await self._session.commit()

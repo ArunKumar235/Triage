@@ -1,13 +1,12 @@
 import uuid
-from enum import Enum
 from datetime import datetime, UTC
 from sqlalchemy.orm import Mapped, mapped_column, validates
 from sqlalchemy import ForeignKey, Enum as SQLEnum, String, DateTime
 
 from triage.models.db.base import Base
-from triage.models.schemas.testable_type import TestableType
-from triage.models.schemas.priority import Priority
-from triage.models.schemas.testable_status import TestableStatus
+from triage.models.schemas.enums.testable_type import TestableType
+from triage.models.schemas.enums.priority import Priority
+from triage.models.schemas.enums.testable_status import TestableStatus
 
 class Testable(Base):
     __tablename__ = "testables"
