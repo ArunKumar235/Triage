@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from fastapi import Depends, Header, HTTPException, status
 
 from triage.config import Settings, get_settings
+from triage.core.kafka.producer import KafkaProducerWrapper
 from triage.services.team_member_service import TeamMemberService
 from triage.services.team_service import TeamService
 from triage.services.testable_service import TestableService
@@ -67,3 +68,10 @@ async def get_team_member_service(
     db: AsyncSession = Depends(get_db)
 ) -> TeamMemberService:
     return TeamMemberService(db)
+
+async def get_kafka_producer(
+    settings: Settings = Depends(get_settings)
+) -> KafkaProducerWrapper:
+    from triage.core.kafka.producer import get_producer
+    
+    return get_producer(settings)

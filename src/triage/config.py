@@ -8,6 +8,16 @@ class Settings(BaseSettings):
     database_url: str
     webhook_shared_secret: str
 
+    kafka_bootstrap_servers: str
+    
+    kafka_topic_testable_ready_for_testing: str
+    kafka_topic_member_availability_changed: str
+    kafka_topic_assignment_completed: str
+
+    kafka_topic_testable_ready_for_testing_dlq: str
+    kafka_topic_member_availability_changed_dlq: str
+    kafka_topic_assignment_completed_dlq: str
+
     model_config = SettingsConfigDict(
         env_file=".env", 
         env_file_encoding="utf-8",
