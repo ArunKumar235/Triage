@@ -69,3 +69,13 @@ class TeamMemberRepository:
         
         team_member.is_available = is_available
         await self._session.commit()
+
+    async def get_max_capacity(self, member_id: uuid.UUID) -> float:
+        """
+        Retrieves the maximum capacity of a team member.
+        """
+        query = select(TeamMember.max_capacity_per_sprint).where(TeamMember.id == member_id)
+        result = await self._session.scalar(query)
+        if result is None:
+            raise ValueError(f"Team member with id {member_id} does not exist")
+        return result

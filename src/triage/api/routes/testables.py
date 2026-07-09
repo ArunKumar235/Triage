@@ -58,7 +58,7 @@ async def get_testable(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
-@router.publish(
+@router.patch(
     "/{testable_id}/publish",
     status_code=status.HTTP_202_ACCEPTED
 )
@@ -70,7 +70,7 @@ async def publish_testable(
     """
     Fired by Jira/ServiceNow when a story or defect is marked ready for testing.
 
-    Publishes onto `testable.created` and returns immediately — the assignment
+    Publishes onto `testable.ready.for.testing` and returns immediately — the assignment
     consumer does the actual LangGraph work asynchronously.
     """
     try:

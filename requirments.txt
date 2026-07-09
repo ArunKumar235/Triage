@@ -8,3 +8,6 @@ fastapi
 uvicorn[standard]
 
 aiokafka
+
+langgraph
+langchain
