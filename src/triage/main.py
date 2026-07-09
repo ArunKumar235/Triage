@@ -13,11 +13,13 @@ from triage.core.kafka.producer import close_producer, get_producer
 from triage.core.kafka.consumer_assignment import consume_assignment_events
 from triage.core.kafka.consumer_rebalancing import consume_rebalancing_events
 from triage.core.kafka.consumer_notification import consume_notification_events
+from triage.core.kafka.init_topics import ensure_kafka_topics
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_engine(get_settings())
     get_producer(get_settings())
+    await ensure_kafka_topics(get_settings())
 
     # Signal the consumer loops to drain and exit on app shutdown.
     stop_event = asyncio.Event()

@@ -3,11 +3,13 @@ from aiokafka import AIOKafkaConsumer, OffsetAndMetadata
 
 from triage.config import get_settings
 from triage.core.kafka.topics import ConsumerGroups, Topics
-from triage.models.schemas.kafka_events import TestableReadyForTestingEvent
+from triage.models.schemas.kafka_events import TestableReadyForTestingEvent, AssignmentCompletedEvent
 from triage.core.kafka.producer import get_producer
+from triage.core.graph.assignment_graph import run_assignment_graph
 
 async def consume_assignment_events(stop_event: asyncio.Event | None = None) -> None:
     settings = get_settings()
+    producer = get_producer(settings)
 
     consumer = AIOKafkaConsumer(
         Topics.TESTABLE_READY_FOR_TESTING,
@@ -35,8 +37,24 @@ async def consume_assignment_events(stop_event: asyncio.Event | None = None) -> 
                     try:
                         event = TestableReadyForTestingEvent.model_validate_json(message.value)
 
-                        # Run langgraph assignment chain
-                        # Publish to ASSIGNMENT_COMPLETED topic with the assignment result
+                        # Runs eligibility -> capacity -> expertise (RAG) ->
+                        # constraint scorer -> orchestrator LLM and returns a
+                        # structured AssignmentDecision.
+                        decision = await run_assignment_graph(event)
+
+                        completed = AssignmentCompletedEvent(
+                            testable_id=event.testable_id,
+                            team_id=event.team_id,
+                            assigned_to=decision.top_candidate,
+                            confidence=decision.confidence,
+                            reasoning=decision.reasoning
+                        )
+
+                        await producer.publish(
+                            topic=Topics.ASSIGNMENT_COMPLETED,
+                            value=completed.model_dump_json(),
+                            key=event.testable_id
+                        )
 
                         # Commit EXACTLY this message's offset + 1
                         # We add +1 because Kafka expects the offset of the *next* message to be read
@@ -44,7 +62,6 @@ async def consume_assignment_events(stop_event: asyncio.Event | None = None) -> 
                         await consumer.commit({tp: offset_metadata})
 
                     except Exception as e:
-                        producer = get_producer(settings)
                         max_retries = 3
                         retry_count = 0
 

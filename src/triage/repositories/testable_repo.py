@@ -1,5 +1,6 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, func
 
 from triage.models.schemas.enums.role import Role
 from triage.models.schemas.enums.testable_status import TestableStatus
@@ -88,3 +89,38 @@ class TestableRepository:
         """
         testable = await self._session.get(Testable, testable_id)
         return testable
+    
+    async def get_developers_for_testable(self, testable_id: str) -> list[uuid.UUID]:
+        """
+        Member IDs who did development work on this testable — used by
+        the eligibility agent to exclude them from testing their own work.
+        """
+        query = (
+            select(DevHistory.team_member_id)
+            .where(
+                DevHistory.testable_id == testable_id,
+                DevHistory.role == Role.DEVELOPER
+            )
+        )
+        result = await self._session.scalars(query)
+        return result.all()
+    
+    async def get_pending_build_points(self, member_id: uuid.UUID) -> float:
+        """
+        Retrieves the total build points of testables that are not yet 
+        completed, where this team member was the developer.
+        """
+        query = (
+            select(func.sum(Testable.build_points))
+            .join(DevHistory, DevHistory.testable_id == Testable.id)
+            .where(
+                DevHistory.team_member_id == member_id,
+                DevHistory.role == Role.DEVELOPER,
+                Testable.status != TestableStatus.COMPLETED
+            )
+        )
+
+        result = await self._session.scalar(query)
+        
+        # scalar() returns None if there are no matching rows, so we fallback to 0.0
+        return float(result or 0.0)

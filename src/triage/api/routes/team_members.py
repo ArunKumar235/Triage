@@ -60,7 +60,10 @@ async def update_member_availability(
     team_member_service: TeamMemberService = Depends(get_team_member_service)
 ):
     """
-    Update the availability of a team member.
+    Fired by Jira/ServiceNow when a member availability changes.
+
+    Publishes onto `member.availability.changed` and returns immediately, 
+    rebalancing consumer does the actual LangGraph work asynchronously.
     """
     try:
         await team_member_service.update_member_availability(team_id, payload)

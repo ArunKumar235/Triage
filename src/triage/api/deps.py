@@ -16,7 +16,7 @@ def init_engine(settings: Settings):
     if _engine is None:
         _engine = create_async_engine(
             settings.database_url, 
-            echo=True,
+            echo=False,
             pool_pre_ping=True
         )
         _session_factory = async_sessionmaker(
