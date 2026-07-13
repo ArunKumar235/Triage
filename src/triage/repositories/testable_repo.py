@@ -124,3 +124,24 @@ class TestableRepository:
         
         # scalar() returns None if there are no matching rows, so we fallback to 0.0
         return float(result or 0.0)
+
+    async def assign_tester_to_testable(self, testable_id: str, tester_id: uuid.UUID) -> None:
+        """
+        Assigns a tester to a specific testable.
+        """
+        testable = await self._session.get(Testable, testable_id)
+        if testable is None:
+            raise ValueError(f"Testable with id {testable_id} does not exist")
+        
+        testable.assigned_to = tester_id
+        testable.status = TestableStatus.ASSIGNED
+
+        # update the DevHistory to reflect the tester assignment
+        dev_history_entry = DevHistory(
+            testable_id=testable_id,
+            team_member_id=tester_id,
+            role=Role.TESTER,
+        )
+        self._session.add(dev_history_entry)
+
+        await self._session.commit()

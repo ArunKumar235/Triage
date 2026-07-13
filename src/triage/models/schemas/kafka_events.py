@@ -40,8 +40,8 @@ class AssignmentCompletedEvent(BaseModel):
     not on the wire."""
 
     testable_id: str
-    team_id: str
-    assigned_to: str
+    team_id: uuid.UUID
+    assigned_to: uuid.UUID
     confidence: float
     reasoning: str
 

@@ -3,7 +3,7 @@ from typing import Optional, TypedDict
 
 from triage.models.schemas.assignment_decision import AssignmentDecision
 from triage.models.schemas.kafka_events import TestableReadyForTestingEvent
-
+from triage.core.scoring.constraint_weights import CandidateScore
 
 class CandidateContext(TypedDict):
     member_id: uuid.UUID
@@ -25,7 +25,7 @@ class AssignmentState(TypedDict, total=False):
     candidates: list[CandidateContext]
 
     # set by constraint_scorer_node
-    # ranked_candidates: list[CandidateScore]
+    ranked_candidates: list[CandidateScore]
 
     # set by orchestrator_llm_node
     decision: Optional[AssignmentDecision]
