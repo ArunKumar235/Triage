@@ -6,6 +6,9 @@ from triage.core.kafka.topics import ConsumerGroups, Topics
 from triage.models.schemas.kafka_events import TestableReadyForTestingEvent, AssignmentCompletedEvent
 from triage.core.kafka.producer import get_producer
 from triage.core.graph.assignment_graph import run_assignment_graph
+from triage.api.deps import get_session_factory
+from triage.repositories.assignment_repo import AssignmentRepository
+from triage.repositories.testable_repo import TestableRepository
 
 async def consume_assignment_events(stop_event: asyncio.Event | None = None) -> None:
     settings = get_settings()
@@ -42,10 +45,18 @@ async def consume_assignment_events(stop_event: asyncio.Event | None = None) -> 
                         # structured AssignmentDecision.
                         decision = await run_assignment_graph(event)
 
+                        session_factory = get_session_factory()
+                        async with session_factory() as session:
+                            assignment_repo = AssignmentRepository(session)
+                            testable_repo = TestableRepository(session)
+
+                            await assignment_repo.save_decision(event.testable_id, event.team_id, decision)
+                            await testable_repo.assign_tester_to_testable(event.testable_id, decision.top_candidate_id)
+
                         completed = AssignmentCompletedEvent(
                             testable_id=event.testable_id,
                             team_id=event.team_id,
-                            assigned_to=decision.top_candidate,
+                            assigned_to=decision.top_candidate_id,
                             confidence=decision.confidence,
                             reasoning=decision.reasoning
                         )

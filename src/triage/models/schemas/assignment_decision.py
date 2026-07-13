@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 class RankedCandidate(BaseModel):
     member_id: uuid.UUID
-    member_display_name: str
+    # member_display_name: str
     composite_score: float
     capacity_score: float
     expertise_score: float
@@ -19,9 +19,9 @@ class AssignmentDecision(BaseModel):
     of re-running the constraint scorer and the LLM from scratch.
     """
 
-    testable_id: uuid.UUID
+    testable_id: str
     ranked_candidates: list[RankedCandidate]
-    top_candidate: str
+    top_candidate_id: uuid.UUID
     confidence: float = Field(ge=0.0, le=1.0)
     primary_rule_applied: Literal["capacity", "expertise", "seniority", "tiebreak"]
     reasoning: str

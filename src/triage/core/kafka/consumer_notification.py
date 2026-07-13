@@ -34,6 +34,9 @@ async def consume_notification_events(stop_event: asyncio.Event | None = None):
 
                         # Send notification email to the team member about the assignment result
 
+                        # for now we'll just print the event to the console
+                        print(f"Notification Event: {event}")
+
                         # Commit EXACTLY this message's offset + 1
                         # We add +1 because Kafka expects the offset of the *next* message to be read
                         offset_metadata = OffsetAndMetadata(message.offset + 1, "")

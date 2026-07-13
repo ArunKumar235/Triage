@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     kafka_topic_member_availability_changed_dlq: str
     kafka_topic_assignment_completed_dlq: str
 
+    orchestrator_model: str
+
     model_config = SettingsConfigDict(
         env_file=".env", 
         env_file_encoding="utf-8",

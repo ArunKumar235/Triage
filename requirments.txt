@@ -11,3 +11,4 @@ aiokafka
 
 langgraph
 langchain
+langchain-ollama
