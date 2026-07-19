@@ -1,0 +1,1 @@
+uv run uvicorn triage.main:app --reload

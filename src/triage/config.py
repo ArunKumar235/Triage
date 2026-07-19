@@ -20,6 +20,9 @@ class Settings(BaseSettings):
 
     orchestrator_model: str
 
+    vector_store_path: str
+    embedding_model: str
+
     model_config = SettingsConfigDict(
         env_file=".env", 
         env_file_encoding="utf-8",

@@ -12,3 +12,5 @@ aiokafka
 langgraph
 langchain
 langchain-ollama
+
+chromadb

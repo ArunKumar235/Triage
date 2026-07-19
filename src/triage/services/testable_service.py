@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from triage.core.rag.vector_store import get_vector_store
 from triage.models.db.testable import Testable
 from triage.models.schemas.webhook_payloads import TestableWebhookPayload
 from triage.repositories.testable_repo import TestableRepository
@@ -13,7 +14,19 @@ class TestableService:
             raise ValueError("Team id is required")
         
         await self._repo.team_and_developers_exists(testable.team_id, testable.developed_by)
-        return await self._repo.upsert_testable(testable)
+        result = await self._repo.upsert_testable(testable)
+
+        vector_store = get_vector_store()
+
+        vector_store.upsert_testable_record(
+            testable_id=testable.testable_id,
+            team_id=testable.team_id,
+            member_ids=testable.developed_by,
+            app=testable.app,
+            feature=testable.feature,
+            description=testable.description
+        )
+        return result
 
     async def get_testables(self) -> list[Testable]:
         return await self._repo.get_testables()
