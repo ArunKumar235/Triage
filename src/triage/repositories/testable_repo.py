@@ -116,7 +116,7 @@ class TestableRepository:
             .where(
                 DevHistory.team_member_id == member_id,
                 DevHistory.role == Role.DEVELOPER,
-                Testable.status != TestableStatus.COMPLETED
+                Testable.status == TestableStatus.UNASSIGNED,  # Unassigned testables are pending, as they haven't been marked as ready for testing yet
             )
         )
 
@@ -136,12 +136,27 @@ class TestableRepository:
         testable.assigned_to = tester_id
         testable.status = TestableStatus.ASSIGNED
 
-        # update the DevHistory to reflect the tester assignment
-        dev_history_entry = DevHistory(
-            testable_id=testable_id,
-            team_member_id=tester_id,
-            role=Role.TESTER,
+        query = (
+            select(DevHistory)
+            .where(
+                DevHistory.testable_id == testable_id,
+                DevHistory.role == Role.TESTER
+            )
         )
+        result = await self._session.scalars(query)
+        
+        existing_entry = result.first()
+        
+        if existing_entry is not None:
+            dev_history_entry = existing_entry
+            dev_history_entry.team_member_id = tester_id
+        else:
+            dev_history_entry = DevHistory(
+                testable_id=testable_id,
+                team_member_id=tester_id,
+                role=Role.TESTER
+            )
+
         self._session.add(dev_history_entry)
 
         await self._session.commit()
