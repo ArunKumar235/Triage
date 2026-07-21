@@ -59,6 +59,13 @@ class TeamMemberRepository:
         result = await self._session.scalar(query)
         return result
 
+    async def get_member_by_id(self, member_id: uuid.UUID) -> TeamMember:
+        """
+        Retrieves a specific team member globally by ID from the database.
+        """
+        result = await self._session.get(TeamMember, member_id)
+        return result
+
     async def update_member_availability(self, team_id: uuid.UUID, member_id: uuid.UUID, is_available: bool) -> None:
         """
         Updates the availability of a team member.
