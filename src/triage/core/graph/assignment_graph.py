@@ -1,4 +1,5 @@
 from langgraph.graph import StateGraph, START, END
+from langchain_core.runnables import RunnableConfig
 
 from triage.core.graph.nodes.orchestrator_llm import orchestrator_llm_node
 from triage.models.schemas.kafka_events import TestableReadyForTestingEvent
@@ -47,7 +48,12 @@ async def run_assignment_graph(event: TestableReadyForTestingEvent) -> Assignmen
     compiled_graph = _get_compiled_graph()
     initial_state: AssignmentState = {"event": event}
 
-    final_state = await compiled_graph.ainvoke(initial_state)
+    config = RunnableConfig(
+        run_name=f"Assignment Workflow: {event.testable_id}",
+        metadata={"testable_id": event.testable_id},
+        tags=["assignment_graph"]
+    )
+    final_state = await compiled_graph.ainvoke(initial_state, config=config)
 
     decision = final_state.get("decision")
     if decision is None:

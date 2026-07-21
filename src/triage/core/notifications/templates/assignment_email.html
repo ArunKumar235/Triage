@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Testable assigned</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f1efe8; font-family:Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1efe8; padding:32px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border:1px solid #d3d1c7; border-radius:8px; overflow:hidden;">
+
+          <tr>
+            <td style="background-color:#26215c; padding:20px 28px;">
+              <span style="color:#eeedfe; font-size:16px; font-weight:bold;">New testing assignment</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:28px;">
+              <p style="margin:0 0 16px 0; font-size:14px; color:#2c2c2a;">
+                Hi {{ member_name }},
+              </p>
+              <p style="margin:0 0 20px 0; font-size:14px; color:#2c2c2a; line-height:1.6;">
+                You've been assigned a testable by the QA assignment engine.
+              </p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #d3d1c7; border-radius:6px; margin-bottom:20px;">
+                <tr>
+                  <td style="padding:12px 16px; font-size:13px; color:#5f5e5a; border-bottom:1px solid #f1efe8;">Testable ID</td>
+                  <td style="padding:12px 16px; font-size:13px; color:#2c2c2a; border-bottom:1px solid #f1efe8; text-align:right;">{{ testable_id }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px; font-size:13px; color:#5f5e5a; border-bottom:1px solid #f1efe8;">Application</td>
+                  <td style="padding:12px 16px; font-size:13px; color:#2c2c2a; border-bottom:1px solid #f1efe8; text-align:right;">{{ app }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px; font-size:13px; color:#5f5e5a; border-bottom:1px solid #f1efe8;">Feature</td>
+                  <td style="padding:12px 16px; font-size:13px; color:#2c2c2a; border-bottom:1px solid #f1efe8; text-align:right;">{{ feature }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px; font-size:13px; color:#5f5e5a; border-bottom:1px solid #f1efe8;">Priority</td>
+                  <td style="padding:12px 16px; font-size:13px; text-align:right;">
+                    <span style="background-color:#faece7; color:#4a1b0c; padding:2px 10px; border-radius:10px; font-size:12px; font-weight:bold;">{{ priority }}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px; font-size:13px; color:#5f5e5a;">Assignment confidence</td>
+                  <td style="padding:12px 16px; font-size:13px; color:#2c2c2a; text-align:right;">{{ confidence }}</td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 6px 0; font-size:12px; color:#5f5e5a; text-transform:uppercase; letter-spacing:0.5px;">Why you</p>
+              <p style="margin:0 0 24px 0; font-size:14px; color:#2c2c2a; line-height:1.6; background-color:#f1efe8; padding:14px 16px; border-radius:6px;">
+                {{ reasoning }}
+              </p>
+
+              <p style="margin:0; font-size:12px; color:#888780; line-height:1.6;">
+                If this assignment looks wrong, override it from the assignment dashboard — your reason gets fed back into future assignment decisions.
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background-color:#f1efe8; padding:16px 28px; text-align:center;">
+              <span style="font-size:11px; color:#888780;">Sent automatically by the QA assignment engine</span>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

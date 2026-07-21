@@ -3,6 +3,7 @@ from aiokafka import AIOKafkaConsumer, OffsetAndMetadata
 
 from triage.config import get_settings
 from triage.core.kafka.topics import ConsumerGroups, Topics
+from triage.core.notifications.email_sender import send_assignment_email
 from triage.models.schemas.kafka_events import AssignmentCompletedEvent
 from triage.core.kafka.producer import get_producer
 
@@ -33,9 +34,7 @@ async def consume_notification_events(stop_event: asyncio.Event | None = None):
                         event = AssignmentCompletedEvent.model_validate_json(message.value)
 
                         # Send notification email to the team member about the assignment result
-
-                        # for now we'll just print the event to the console
-                        print(f"Notification Event: {event}")
+                        await send_assignment_email(event)
 
                         # Commit EXACTLY this message's offset + 1
                         # We add +1 because Kafka expects the offset of the *next* message to be read

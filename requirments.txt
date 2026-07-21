@@ -12,5 +12,9 @@ aiokafka
 langgraph
 langchain
 langchain-ollama
+langsmith
 
 chromadb
+
+jinja2
+aiosmtplib
